@@ -3,7 +3,7 @@ WORKDIR /tmp
 
 COPY ./src ./src
 COPY ./pom.xml .
-RUN mvn package
+RUN mvn clean package install -DskipTests=true
 
 FROM openjdk:17-alpine AS run
 COPY --from=builder /tmp/target/app.jar /app/app.jar

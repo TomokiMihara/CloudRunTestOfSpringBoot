@@ -1,0 +1,24 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>タスクリスト</title>
+    </head>
+    <body>
+        <table>
+            <tr>
+              <th>タスクID</th>
+              <th>タスク名</th>
+              <th>作成日時</th>
+              <th>更新日時</th>
+            </tr>
+            <tr th:each="list : ${TaskList}">
+              <td th:text="${list.task_id}"></td>
+              <td th:text="${list.task_name}"></td>
+              <td th:text="${list.task_ins_timestamp}"></td>
+              <td th:text="${list.task_upd_timestamp}"></td>
+            </tr>
+          </table>
+    </body>
+</html>
