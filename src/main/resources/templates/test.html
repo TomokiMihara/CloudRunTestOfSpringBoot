@@ -10,7 +10,7 @@
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>タスクリスト</title>
+  <title>CAバックエンドディビジョン構築課題</title>
 </head>
 
 <body>
@@ -153,14 +153,29 @@
         <th>操作</th>
         <th>タスクID</th>
         <th>タスク名</th>
-        <th>作成日時</th>
+        <th>ラベル</th>
+        <th>ステータス</th>
+        <th>優先順位</th>
+        <th>課題終了日時</th>
+        <th>タスク起票日時</th>
+        <th>ステータス更新日時</th>
         <th>更新日時</th>
       </tr>
       <tr th:each="list : ${TaskList}">
-        <td></td>
+        <td>
+          <div>
+            <button type="button" class="btn btn-outline-primary btn-sm">編集</button>
+            <button type="button" class="btn btn-outline-danger btn-sm">削除</button>
+          </div>
+        </td>
         <td th:text="${list.task_id}"></td>
         <td th:text="${list.task_name}"></td>
+        <td th:text="${list.tlabl_name}"></td>
+        <td th:text="${list.tstus_name}"></td>
+        <td th:text="${list.tpri_name}"></td>
+        <td th:text="${list.tsm_end_datetime}"></td>
         <td th:text="${list.task_ins_timestamp}"></td>
+        <td th:text="${list.latest_state_updtimestamp}"></td>
         <td th:text="${list.task_upd_timestamp}"></td>
       </tr>
     </table>
