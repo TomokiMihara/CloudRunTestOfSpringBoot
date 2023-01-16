@@ -1,6 +1,6 @@
 package com.sample.task_manage.controller;
 
-import com.sample.task_manage.model.Task;
+import com.sample.task_manage.model.TaskOverView;
 import com.sample.task_manage.repository.TaskRepository;
 
 import java.util.List;
@@ -16,12 +16,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GreetingController {
     private final TaskRepository taskRepository;
-    
+
     @GetMapping("/")
     public String index(Model model) {
-        List<Task> list = taskRepository.getAll();
-		model.addAttribute("TaskList",list);
-		return "test";
+        List<TaskOverView> list = taskRepository.getAll();
+        model.addAttribute("TaskList", list);
+        return "test";
     }
 
 }
