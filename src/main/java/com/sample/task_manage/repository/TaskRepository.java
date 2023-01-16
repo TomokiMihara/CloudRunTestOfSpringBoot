@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
 
-import com.sample.task_manage.factory.TcpConnectionPoolFactory;
+import com.sample.task_manage.factory.ConnectorConnectionPoolFactory;
 import com.sample.task_manage.model.Task;
 
 import javax.sql.DataSource;
@@ -32,7 +32,7 @@ public class TaskRepository {
 
         private static DataSource setupPool() {
             DataSource pool;
-            pool = TcpConnectionPoolFactory.createConnectionPool();
+            pool = ConnectorConnectionPoolFactory.createConnectionPool();
 
             return pool;
         }
