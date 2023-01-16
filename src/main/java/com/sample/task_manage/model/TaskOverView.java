@@ -1,6 +1,6 @@
 package com.sample.task_manage.model;
 
-import com.google.api.client.util.DateTime;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,15 +24,15 @@ public class TaskOverView {
     private String tpri_name;
 
     //期限日時
-    private DateTime tsm_end_datetime;
+    private LocalDateTime tsm_end_datetime;
 
     //タスク起票日時
-    private DateTime task_ins_timestamp;
+    private LocalDateTime task_ins_timestamp;
 
     //ステータス最終更新日時
-    private DateTime latest_state_updtimestamp;
+    private LocalDateTime latest_state_updtimestamp;
 
     //タスク更新日時
-    private DateTime task_upd_timestamp;
+    private LocalDateTime task_upd_timestamp;
 
 }

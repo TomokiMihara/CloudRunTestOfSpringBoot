@@ -8,14 +8,15 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
 
-import com.google.api.client.util.DateTime;
 import com.sample.task_manage.factory.ConnectorConnectionPoolFactory;
+import com.sample.task_manage.factory.TcpConnectionPoolFactory;
 import com.sample.task_manage.model.TaskOverView;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,7 +33,13 @@ public class TaskRepository {
 
         private static DataSource setupPool() {
             DataSource pool;
-            pool = ConnectorConnectionPoolFactory.createConnectionPool();
+
+            String is_prod = System.getenv("is_prod");
+            if (is_prod != null) {
+                pool = ConnectorConnectionPoolFactory.createConnectionPool();
+            } else {
+                pool = TcpConnectionPoolFactory.createConnectionPool();
+            }
 
             return pool;
         }
@@ -97,11 +104,10 @@ public class TaskRepository {
                 String tlabl_name = taskResults.getString("tlabl_name");
                 String tstus_name = taskResults.getString("tstus_name");
                 String tpri_name = taskResults.getString("tpri_name");
-                DateTime tsm_end_datetime = new DateTime(taskResults.getTimestamp("tsm_end_datetime").getTime());
-                DateTime task_ins_timestamp = new DateTime(taskResults.getTimestamp("task_ins_timestamp").getTime());
-                DateTime latest_state_updtimestamp = new DateTime(
-                        taskResults.getTimestamp("latest_state_updtimestamp").getTime());
-                DateTime task_upd_timestamp = new DateTime(taskResults.getTimestamp("task_upd_timestamp").getTime());
+                LocalDateTime tsm_end_datetime = taskResults.getTimestamp("tsm_end_datetime").toLocalDateTime();
+                LocalDateTime task_ins_timestamp = taskResults.getTimestamp("task_ins_timestamp").toLocalDateTime();
+                LocalDateTime latest_state_updtimestamp = taskResults.getTimestamp("latest_state_updtimestamp").toLocalDateTime();
+                LocalDateTime task_upd_timestamp = taskResults.getTimestamp("task_upd_timestamp").toLocalDateTime();
 
                 list.add(new TaskOverView(
                         task_id,
