@@ -10,25 +10,30 @@ import org.springframework.stereotype.Repository;
 
 import com.sample.task_manage.factory.ConnectorConnectionPoolFactory;
 import com.sample.task_manage.factory.TcpConnectionPoolFactory;
-import com.sample.task_manage.model.TaskOverView;
+import com.sample.task_manage.model.ViewModel.CreateTask;
+import com.sample.task_manage.model.ViewModel.TaskLabel;
+import com.sample.task_manage.model.ViewModel.TaskOverView;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @Repository
 @RequiredArgsConstructor
 public class TaskRepository {
+    private final static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH時mm分ss秒")
+            .withZone(ZoneId.of("Asia/Tokyo"));
+
     private static class PoolHolder {
 
-        // Making the default constructor private prohibits instantiation of this class
         private PoolHolder() {
         }
 
-        // This value is initialized only if (and when) the getInstance() function below
-        // is called
         private static final DataSource INSTANCE = setupPool();
 
         private static DataSource setupPool() {
@@ -47,6 +52,86 @@ public class TaskRepository {
         private static DataSource getInstance() {
             return PoolHolder.INSTANCE;
         }
+    }
+
+    // 論理削除
+    public void deleteTask(int task_id) {
+        DataSource pool = PoolHolder.getInstance();
+
+        String sql = """
+                    update task set task_del_flg = 1 where task_id = ?
+                """;
+
+        Connection conn;
+
+        try {
+            conn = pool.getConnection();
+            PreparedStatement taskStmt = conn.prepareStatement(sql);
+            taskStmt.setInt(1, task_id);
+
+            taskStmt.executeUpdate();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createTask(CreateTask task) {
+        DataSource pool = PoolHolder.getInstance();
+
+        String sql = """
+                    INSERT INTO task (task_name,task_label_id,task_ins_timestamp,task_upd_timestamp,task_del_flg) values (?,?,?,?,0)
+                """;
+
+        Connection conn;
+
+        try {
+            conn = pool.getConnection();
+            PreparedStatement taskStmt = conn.prepareStatement(sql);
+            taskStmt.setString(1, task.getTask_name());
+            taskStmt.setInt(2, task.getTask_label_id());
+            taskStmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            taskStmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+            taskStmt.executeUpdate();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<TaskLabel> getLabelList() {
+        DataSource pool = PoolHolder.getInstance();
+        List<TaskLabel> list = new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    tlabl_id,
+                    tlabl_name
+                FROM
+                    task_up.task_label
+                ORDER BY
+                    tstus_ins_timestamp desc
+                                """;
+        try {
+            Connection conn = pool.getConnection();
+            PreparedStatement taskStmt = conn.prepareStatement(sql);
+
+            ResultSet labelResults = taskStmt.executeQuery();
+
+            while (labelResults.next()) {
+                int tlabl_id = labelResults.getInt("tlabl_id");
+                String tlabl_name = labelResults.getString("tlabl_name");
+
+                list.add(new TaskLabel(
+                        tlabl_id,
+                        tlabl_name));
+            }
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     public List<TaskOverView> getAll() {
@@ -104,10 +189,38 @@ public class TaskRepository {
                 String tlabl_name = taskResults.getString("tlabl_name");
                 String tstus_name = taskResults.getString("tstus_name");
                 String tpri_name = taskResults.getString("tpri_name");
-                LocalDateTime tsm_end_datetime = taskResults.getTimestamp("tsm_end_datetime").toLocalDateTime();
-                LocalDateTime task_ins_timestamp = taskResults.getTimestamp("task_ins_timestamp").toLocalDateTime();
-                LocalDateTime latest_state_updtimestamp = taskResults.getTimestamp("latest_state_updtimestamp").toLocalDateTime();
-                LocalDateTime task_upd_timestamp = taskResults.getTimestamp("task_upd_timestamp").toLocalDateTime();
+
+                String tsm_end_datetime_str = "";
+                Timestamp tsm_end_timestamp = taskResults.getTimestamp("tsm_end_datetime");
+                if (tsm_end_timestamp != null) {
+                    LocalDateTime tsm_end_localDateTime = null;
+                    tsm_end_localDateTime = tsm_end_timestamp.toLocalDateTime();
+                    tsm_end_datetime_str = timeFormatter.format(tsm_end_localDateTime);
+                }
+
+                String task_ins_datetime_str = "";
+                Timestamp task_ins_timestamp = taskResults.getTimestamp("task_ins_timestamp");
+                if (task_ins_timestamp != null) {
+                    LocalDateTime task_ins_localDateTime = null;
+                    task_ins_localDateTime = task_ins_timestamp.toLocalDateTime();
+                    task_ins_datetime_str = timeFormatter.format(task_ins_localDateTime);
+                }
+
+                String latest_states_datetime_str = "";
+                Timestamp latest_state_updtimestamp = taskResults.getTimestamp("latest_state_updtimestamp");
+                if (latest_state_updtimestamp != null) {
+                    LocalDateTime latest_states_localDateTime = null;
+                    latest_states_localDateTime = latest_state_updtimestamp.toLocalDateTime();
+                    latest_states_datetime_str = timeFormatter.format(latest_states_localDateTime);
+                }
+
+                String task_upd_datetime_str = "";
+                Timestamp task_upd_timestamp = taskResults.getTimestamp("task_upd_timestamp");
+                if (task_upd_timestamp != null) {
+                    LocalDateTime task_upd_localDateTime = null;
+                    task_upd_localDateTime = task_upd_timestamp.toLocalDateTime();
+                    task_upd_datetime_str = timeFormatter.format(task_upd_localDateTime);
+                }
 
                 list.add(new TaskOverView(
                         task_id,
@@ -115,11 +228,12 @@ public class TaskRepository {
                         tlabl_name,
                         tstus_name,
                         tpri_name,
-                        tsm_end_datetime,
-                        task_ins_timestamp,
-                        latest_state_updtimestamp,
-                        task_upd_timestamp));
+                        tsm_end_datetime_str,
+                        task_ins_datetime_str,
+                        latest_states_datetime_str,
+                        task_upd_datetime_str));
             }
+            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,0 +1,32 @@
+<table id="data-table" class="table table-dark table-striped">
+  <tr>
+    <th>操作</th>
+    <th>タスクID</th>
+    <th>タスク名</th>
+    <th>ラベル</th>
+    <th>ステータス</th>
+    <th>優先順位</th>
+    <th>課題終了日時</th>
+    <th>タスク起票日時</th>
+    <th>ステータス更新日時</th>
+    <th>更新日時</th>
+  </tr>
+  <tr th:each="list : ${TaskList}">
+    <td>
+      <div>
+        <button type="button" class="btn btn-outline-primary btn-sm" th:task-id="${list.task_id}">編集</button>
+        <button data-bs-toggle="modal" data-bs-target="#delete-modal" type="button"
+          class="btn btn-outline-danger btn-sm" th:task-id="${list.task_id}">削除</button>
+      </div>
+    </td>
+    <td th:text="${list.task_id}"></td>
+    <td th:text="${list.task_name}"></td>
+    <td th:text="${list.tlabl_name}"></td>
+    <td th:text="${list.tstus_name}"></td>
+    <td th:text="${list.tpri_name}"></td>
+    <td th:text="${list.tsm_end_datetime}"></td>
+    <td th:text="${list.task_ins_timestamp}"></td>
+    <td th:text="${list.latest_state_updtimestamp}"></td>
+    <td th:text="${list.task_upd_timestamp}"></td>
+  </tr>
+</table>
