@@ -180,9 +180,8 @@
           <tr th:task-id="${list.task_id}" th:each="list : ${TaskList}">
             <td>
               <div>
-                <button type="button" class="btn btn-outline-primary btn-sm">編集</button>
-                <button data-bs-toggle="modal" data-bs-target="#status-update-modal" type="button"
-                class="btn btn-outline-warning btn-sm" th:task-id="${list.task_id}">状態更新</button>
+                <button data-bs-toggle="modal" data-bs-target="#update-modal" type="button"
+                  class="btn btn-outline-warning btn-sm" th:task-id="${list.task_id}">編集</button>
                 <button data-bs-toggle="modal" data-bs-target="#delete-modal" type="button"
                   class="btn btn-outline-danger btn-sm" th:task-id="${list.task_id}">削除</button>
               </div>
@@ -201,8 +200,9 @@
       </table>
     </div>
 </body>
+
 <div id="create-modal" class="modal" tabindex="-1">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">タスク新規作成</h5>
@@ -210,13 +210,17 @@
       </div>
       <div class="modal-body">
         <form id="create-form" method="post" name="create" action="/create" accept-charset="UTF8">
-          <input type="text" name="task_name" />
-
-          <select id="task_label_id" name="task_label_id">
-            <option th:each="label : ${LabelList}" th:value="${label.tlabl_id}" th:selected="${label.tlabl_id == id}"
-              th:inline="text">[[${label.tlabl_name}]]</option>
-          </select>
-
+          <div class="mb-3">
+            <label for="task_name" class="col-form-label">タスク名:</label>
+            <input type="text" name="task_name" id="task_name" />
+          </div>
+          <div class="mb-3">
+            <label for="task_label_id" class="col-form-label">ラベル名:</label>
+            <select id="task_label_id" name="task_label_id">
+              <option th:each="label : ${LabelList}" th:value="${label.tlabl_id}" th:selected="${label.tlabl_id == id}"
+                th:inline="text">[[${label.tlabl_name}]]</option>
+            </select>
+          </div>
         </form>
 
       </div>
@@ -228,11 +232,30 @@
   </div>
 </div>
 
-<div id="delete-modal" class="modal" tabindex="-1">
-  <div class="modal-dialog">
+<div id="update-modal" class="modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"></h5>
+        <h5 class="modal-title">タスク編集</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">閉じる</button>
+        <button type="button" class="btn btn-success" id="create-task-btn">更新</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="delete-modal" class="modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">タスク削除</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
