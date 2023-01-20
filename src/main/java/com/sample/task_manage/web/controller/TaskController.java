@@ -1,9 +1,12 @@
-package com.sample.task_manage.controller;
+package com.sample.task_manage.web.controller;
 
-import com.sample.task_manage.model.ViewModel.CreateTask;
-import com.sample.task_manage.model.ViewModel.TaskLabel;
-import com.sample.task_manage.model.ViewModel.TaskOverView;
-import com.sample.task_manage.repository.TaskRepository;
+import com.sample.task_manage.core.model.ViewModel.CreateTask;
+import com.sample.task_manage.core.model.ViewModel.TaskDetail;
+import com.sample.task_manage.core.model.ViewModel.TaskLabel;
+import com.sample.task_manage.core.model.ViewModel.TaskOverView;
+import com.sample.task_manage.core.model.ViewModel.TaskPriority;
+import com.sample.task_manage.core.model.ViewModel.TaskStatus;
+import com.sample.task_manage.core.repository.TaskRepository;
 
 import java.util.List;
 
@@ -26,10 +29,15 @@ public class TaskController {
     @GetMapping("/")
     public String index(Model model) {
         List<TaskOverView> task_list = taskRepository.getAll();
+        // マスタデータ取得
         List<TaskLabel> label_list = taskRepository.getLabelList();
+        List<TaskPriority> priority_list = taskRepository.getPriorityList();
+        List<TaskStatus> status_list = taskRepository.getStatusList();
 
         model.addAttribute("TaskList", task_list);
         model.addAttribute("LabelList", label_list);
+        model.addAttribute("PriorityList", priority_list);
+        model.addAttribute("StatusList", status_list);
 
         return "task/index";
     }
@@ -46,15 +54,21 @@ public class TaskController {
     String createTask(Model model, @ModelAttribute CreateTask taskForm) {
         taskRepository.createTask(taskForm);
         List<TaskOverView> task_list = taskRepository.getAll();
-        List<TaskLabel> label_list = taskRepository.getLabelList();
 
         model.addAttribute("TaskList", task_list);
-        model.addAttribute("LabelList", label_list);
 
         return "task/index";
     }
 
-    // タスク作成
+    // タスク詳細
+    @RequestMapping(path = "/get/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    TaskDetail getTaskDetails(Model model, @PathVariable("id") int task_id) {
+        TaskDetail taskDetail = taskRepository.getTaskDetail(task_id);
+        return taskDetail;
+    }
+
+    // タスク削除
     @RequestMapping(path = "/delete/{id}", method = RequestMethod.POST)
     @ResponseBody
     String deleteTask(Model model, @PathVariable("id") int task_id) {

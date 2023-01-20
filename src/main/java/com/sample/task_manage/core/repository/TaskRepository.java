@@ -1,4 +1,4 @@
-package com.sample.task_manage.repository;
+package com.sample.task_manage.core.repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +8,14 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Repository;
 
-import com.sample.task_manage.factory.ConnectorConnectionPoolFactory;
-import com.sample.task_manage.factory.TcpConnectionPoolFactory;
-import com.sample.task_manage.model.ViewModel.CreateTask;
-import com.sample.task_manage.model.ViewModel.TaskLabel;
-import com.sample.task_manage.model.ViewModel.TaskOverView;
+import com.sample.task_manage.core.model.ViewModel.CreateTask;
+import com.sample.task_manage.core.model.ViewModel.TaskDetail;
+import com.sample.task_manage.core.model.ViewModel.TaskLabel;
+import com.sample.task_manage.core.model.ViewModel.TaskOverView;
+import com.sample.task_manage.core.model.ViewModel.TaskPriority;
+import com.sample.task_manage.core.model.ViewModel.TaskStatus;
+import com.sample.task_manage.infrastructure.context.ConnectorConnectionPoolFactory;
+import com.sample.task_manage.infrastructure.context.TcpConnectionPoolFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -52,6 +55,12 @@ public class TaskRepository {
         private static DataSource getInstance() {
             return PoolHolder.INSTANCE;
         }
+    }
+
+    // タスク詳細
+    public TaskDetail getTaskDetail(int task_id) {
+
+        return null;
     }
 
     // 論理削除
@@ -125,6 +134,80 @@ public class TaskRepository {
                 list.add(new TaskLabel(
                         tlabl_id,
                         tlabl_name));
+            }
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<TaskStatus> getStatusList() {
+        DataSource pool = PoolHolder.getInstance();
+        List<TaskStatus> list = new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    tstus_id,
+                    tstus_name
+                FROM
+                    task_up.task_status
+                WHERE
+                    tstus_del_flg = 0
+                ORDER BY
+                    tstus_ins_timestamp desc
+                                """;
+        try {
+            Connection conn = pool.getConnection();
+            PreparedStatement taskStmt = conn.prepareStatement(sql);
+
+            ResultSet labelResults = taskStmt.executeQuery();
+
+            while (labelResults.next()) {
+                int tstus_id = labelResults.getInt("tstus_id");
+                String tstus_name = labelResults.getString("tstus_name");
+
+                list.add(new TaskStatus(
+                        tstus_id,
+                        tstus_name));
+            }
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<TaskPriority> getPriorityList() {
+        DataSource pool = PoolHolder.getInstance();
+        List<TaskPriority> list = new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    tpri_id,
+                    tpri_name
+                FROM
+                    task_up.task_priority
+                WHERE
+                    tpri_del_flg = 0
+                ORDER BY
+                    tpri_ins_timestamp desc
+                                """;
+        try {
+            Connection conn = pool.getConnection();
+            PreparedStatement taskStmt = conn.prepareStatement(sql);
+
+            ResultSet labelResults = taskStmt.executeQuery();
+
+            while (labelResults.next()) {
+                int tpri_id = labelResults.getInt("tpri_id");
+                String tpri_name = labelResults.getString("tpri_name");
+
+                list.add(new TaskPriority(
+                        tpri_id,
+                        tpri_name));
             }
             conn.close();
         } catch (SQLException e) {

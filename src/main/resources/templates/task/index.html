@@ -7,8 +7,16 @@
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.2.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/ja.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CAバックエンドディビジョン構築課題</title>
@@ -233,13 +241,122 @@
 </div>
 
 <div id="update-modal" class="modal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">タスク編集</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+
+
+      <div class="modal-body" style="display: flex;flex-direction: row;">
+        <div style="flex-basis: 400px;margin-right: 25px;">
+          <form id="task-detail-form">
+            <div class="mb-3">
+              <label for="task_name" class="col-form-label">タスク名:</label>
+              <input type="text" name="task_name" id="task_name" />
+            </div>
+            <div class="mb-3">
+              <label for="task_description" class="col-form-label">タスク詳細:</label>
+              <textarea type="text" name="task_description" id="task_description"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="task_label_id" class="col-form-label">ラベル:</label>
+              <select id="task_label_id" name="task_label_id">
+                <option th:each="label : ${LabelList}" th:value="${label.tlabl_id}"
+                  th:selected="${label.tlabl_id == id}" th:inline="text">[[${label.tlabl_name}]]</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="task_label_id" class="col-form-label">現在のステータス:</label>
+              <select id="task_label_id" name="task_label_id">
+                <option th:each="status : ${StatusList}" th:value="${status.tstus_id}"
+                  th:selected="${status.tstus_id == id}" th:inline="text">[[${status.tstus_name}]]</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="task_label_id" class="col-form-label">現在の優先順位:</label>
+              <select id="task_label_id" name="task_label_id">
+                <option th:each="priority : ${PriorityList}" th:value="${priority.tpri_id}"
+                  th:selected="${priority.tpri_id == id}" th:inline="text">[[${priority.tpri_name}]]</option>
+              </select>
+            </div>
+
+            <div class="input-group date mb-3" id="datetimepicker3" data-target-input="nearest">
+              <label for="datetimepicker3" class="pt-2 pr-2">タスク終了予定日時：</label>
+              <div style="display: flex;">
+                <div class="input-group-text" data-target="#datetimepicker3" data-toggle="datetimepicker">
+                  <i class="far fa-calendar-alt"></i>
+                </div>
+                <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" />
+
+              </div>
+
+            </div>
+
+          </form>
+        </div>
+        <div class="accordion" id="status_accordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                aria-expanded="true" aria-controls="collapseOne">
+                Accordion Item #1
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+              data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse
+                plugin adds the appropriate classes that we use to style each element. These classes control the
+                overall
+                appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with
+                custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go
+                within the <code>.accordion-body</code>, though the transition does limit overflow.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Accordion Item #2
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+              data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse
+                plugin adds the appropriate classes that we use to style each element. These classes control the
+                overall
+                appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with
+                custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go
+                within the <code>.accordion-body</code>, though the transition does limit overflow.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Accordion Item #3
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+              data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse
+                plugin adds the appropriate classes that we use to style each element. These classes control the
+                overall
+                appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with
+                custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go
+                within the <code>.accordion-body</code>, though the transition does limit overflow.
+              </div>
+            </div>
+          </div>
+        </div>
 
 
       </div>
@@ -292,6 +409,37 @@
   });
   const delete_modal = new bootstrap.Modal($('#delete-modal'), {
     keyboard: false
+  });
+
+  $('#datetimepicker3').datetimepicker({
+    dayViewHeaderFormat: 'YYYY年 MMMM',
+    tooltips: {
+      close: '閉じる',
+      selectMonth: '月を選択',
+      prevMonth: '前月',
+      nextMonth: '次月',
+      selectYear: '年を選択',
+      prevYear: '前年',
+      nextYear: '次年',
+      selectTime: '時間を選択',
+      selectDate: '日付を選択',
+      prevDecade: '前期間',
+      nextDecade: '次期間',
+      selectDecade: '期間を選択',
+      prevCentury: '前世紀',
+      nextCentury: '次世紀',
+    },
+    format: 'YYYY/MM/DD HH:mm',
+    locale: 'ja',
+    icons: {
+      time: 'far fa-clock',
+      date: 'far fa-calendar-alt',
+      up: 'fas fa-arrow-up',
+      down: 'fas fa-arrow-down',
+    },
+    buttons: {
+      showClose: true,
+    },
   });
 
   //削除モーダルが表示された時
@@ -372,6 +520,10 @@
     font-size: 1em;
   }
 
+  #status_accordion {
+    width: 400px;
+  }
+
   body {
     background-color: #3D3E6F;
   }
@@ -403,5 +555,10 @@
   .counter {
     padding: 8px;
     color: #ccc;
+  }
+
+  .mb-3 {
+    display: flex;
+    flex-direction: column;
   }
 </style>

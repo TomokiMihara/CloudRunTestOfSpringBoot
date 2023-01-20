@@ -1,4 +1,4 @@
-package com.sample.task_manage.model.ViewModel;
+package com.sample.task_manage.core.model.ViewModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
